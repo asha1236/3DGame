@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Cerector : MonoBehaviour
 {
+    CerectorAnim anim;
    // private FreeCamera cam;
     private Transform trCam;
     public Rigidbody rb_Person;
@@ -22,7 +23,7 @@ public class Cerector : MonoBehaviour
 
     private void Awake()
     {
-       // anim = GetComponent<PersonAim>();
+       anim = GetComponent<CerectorAnim>();
        // cam = FindObjectOfType<FreeCamera>();
         //trCam = cam.transform.GetComponent<Transform>();
         rb_Person=GetComponent<Rigidbody>();
@@ -30,6 +31,7 @@ public class Cerector : MonoBehaviour
     void Update()
     {
         newDirectionMove = InputAxis();
+        anim.PlayPersonAnim(newDirectionMove);
     }
     private void FixedUpdate()
     {
