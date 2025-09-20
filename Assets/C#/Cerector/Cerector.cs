@@ -5,13 +5,13 @@ using UnityEngine;
 public class Cerector : MonoBehaviour
 {
     CerectorAnim anim;
-   // private FreeCamera cam;
     private Transform trCam;
     public Rigidbody rb_Person;
-   // private PersonAim anim;
+    // private PersonAim anim;
 
     public float currentSpeed = 10f;
     public float jumpForce = 5f;
+    public float angle = 45f;
 
     private bool isTerra = false;
     private bool isRunning = false;
@@ -23,18 +23,25 @@ public class Cerector : MonoBehaviour
 
     private void Awake()
     {
-       anim = GetComponent<CerectorAnim>();
-       // cam = FindObjectOfType<FreeCamera>();
-        //trCam = cam.transform.GetComponent<Transform>();
-        rb_Person=GetComponent<Rigidbody>();
+        anim = GetComponent<CerectorAnim>();
+        trCam = FindObjectOfType<CerectorCamera>().transform;
+        rb_Person = GetComponent<Rigidbody>();
     }
     void Update()
     {
-        newDirectionMove = InputAxis();
-        anim.PlayPersonAnim(newDirectionMove);
+        directionInput = InputAxis();
+        GetNewDirection(directionInput);
+
+    }
+    private void LateUpdate()
+    {
+        
+        
+        anim.PlayPersonAnim(directionInput);
     }
     private void FixedUpdate()
     {
+        Rotation();
         MovePerson(newDirectionMove);
     }
     private void MovePerson(Vector3 directionMove)
@@ -56,4 +63,17 @@ public class Cerector : MonoBehaviour
         float Z = Input.GetAxis("Vertical");
         return new Vector3(X, 0, Z);
     }
+    void GetNewDirection(Vector3 input)
+    {
+        cameraAxisZ = Vector3.ProjectOnPlane(trCam.forward, Vector3.up);
+        cameraAxisX = Vector3.ProjectOnPlane(trCam.right, Vector3.up);
+        newDirectionMove = (input.z * cameraAxisZ) + (input.x * cameraAxisX);
+    }
+    void Rotation()
+    {
+        Quaternion rotation = Quaternion.LookRotation(cameraAxisZ, Vector3.up);
+        Quaternion newRotation = Quaternion.Slerp(rb_Person.rotation, rotation, Time.fixedDeltaTime * angle);
+        rb_Person.MoveRotation(newRotation);
+    }
+    
 }
